@@ -1,0 +1,594 @@
+
+        <!DOCTYPE html>
+        <html lang="ja">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>株価情報</title>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    margin: 0;
+                    padding: 20px;
+                    min-height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .container {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 30px;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    max-width: 1200px;
+                    width: 100%;
+                }
+                h1 {
+                    text-align: center;
+                    color: #333;
+                    margin: 0 0 30px 0;
+                    font-size: 32px;
+                }
+                .section {
+                    margin: 30px 0;
+                    padding: 20px;
+                    background: white;
+                    border-radius: 8px;
+                    border: 1px solid #e0e0e0;
+                }
+                .section-title {
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #333;
+                    margin: 0 0 15px 0;
+                    padding-bottom: 10px;
+                    border-bottom: 2px solid #667eea;
+                }
+                .price-section {
+                    text-align: center;
+                    padding: 20px;
+                    background: #f5f5f5;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                }
+                .current-price {
+                    font-size: 48px;
+                    font-weight: bold;
+                    color: #333;
+                    margin: 10px 0;
+                }
+                .change-info {
+                    font-size: 20px;
+                    margin: 10px 0;
+                }
+                .change-info.positive {
+                    color: #4caf50;
+                }
+                .change-info.negative {
+                    color: #d32f2f;
+                }
+                .details {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 15px;
+                    margin: 20px 0;
+                }
+                .detail-item {
+                    background: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 5px;
+                    border-left: 4px solid #667eea;
+                }
+                .detail-label {
+                    font-size: 12px;
+                    color: #999;
+                    text-transform: uppercase;
+                    margin-bottom: 5px;
+                }
+                .detail-value {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #333;
+                }
+                .stock-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                .stock-table th,
+                .stock-table td {
+                    border: 1px solid #ddd;
+                    padding: 12px 10px;
+                    text-align: center;
+                }
+                .stock-table th {
+                    background: #f0f0f0;
+                    font-weight: bold;
+                }
+                .positive-cell {
+                    color: #4caf50;
+                    font-weight: bold;
+                }
+                .negative-cell {
+                    color: #d32f2f;
+                    font-weight: bold;
+                }
+                .timestamp {
+                    text-align: center;
+                    color: #666;
+                    font-size: 14px;
+                    margin-top: 20px;
+                    padding-top: 20px;
+                    border-top: 1px solid #ddd;
+                }
+                .charts-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                    gap: 20px;
+                    margin-top: 20px;
+                }
+                .chart-wrapper {
+                    background: #f9f9f9;
+                    padding: 15px;
+                    border-radius: 8px;
+                    border: 1px solid #e0e0e0;
+                }
+                .chart-wrapper h3 {
+                    margin: 0 0 15px 0;
+                    font-size: 16px;
+                    color: #333;
+                }
+                .chart-wrapper canvas {
+                    max-height: 300px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>株価情報</h1>
+                
+                <div class="section">
+                    <div class="section-title">ダウ平均株価 (^DJI)</div>
+                    <div class="price-section">
+                        <div class="current-price">$49,141.93</div>
+                        <div class="change-info negative">
+                            $-25.86 (-0.05%)
+                        </div>
+                    </div>
+                    <div class="details">
+                        <div class="detail-item">
+                            <div class="detail-label">現在株価</div>
+                            <div class="detail-value">$49,141.93</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">変動額</div>
+                            <div class="detail-value negative">$-25.86</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">変動率</div>
+                            <div class="detail-value negative">-0.05%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">シンボル</div>
+                            <div class="detail-value">^DJI</div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="section">
+                    <div class="section-title">米国株 直近30日の変化</div>
+                    <table class="stock-table">
+                        <thead>
+                            <tr>
+                                <th>銘柄</th>
+                                <th>現在株価</th>
+                                <th>前日値</th>
+                                <th>前日との変化率</th>
+                                <th>30日前値</th>
+                                <th>30日前との変化率</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            
+                            <tr>
+                                <td>NVIDIA (NVDA)</td>
+                                <td>$213.17</td>
+                                <td>$216.61</td>
+                                <td class="negative-cell">-1.59%</td>
+                                <td>$183.22</td>
+                                <td class="positive-cell">16.35%</td>
+                            </tr>
+                
+                            <tr>
+                                <td>Micron (MU)</td>
+                                <td>$504.29</td>
+                                <td>$524.56</td>
+                                <td class="negative-cell">-3.86%</td>
+                                <td>$441.61</td>
+                                <td class="positive-cell">14.19%</td>
+                            </tr>
+                
+                            <tr>
+                                <td>Broadcom (AVGO)</td>
+                                <td>$399.83</td>
+                                <td>$418.20</td>
+                                <td class="negative-cell">-4.39%</td>
+                                <td>$324.24</td>
+                                <td class="positive-cell">23.31%</td>
+                            </tr>
+                
+                            <tr>
+                                <td>AMD (AMD)</td>
+                                <td>$323.21</td>
+                                <td>$334.63</td>
+                                <td class="negative-cell">-3.41%</td>
+                                <td>$196.58</td>
+                                <td class="positive-cell">64.42%</td>
+                            </tr>
+                
+                            <tr>
+                                <td>Corning (GLW)</td>
+                                <td>$153.05</td>
+                                <td>$168.01</td>
+                                <td class="negative-cell">-8.90%</td>
+                                <td>$132.05</td>
+                                <td class="positive-cell">15.90%</td>
+                            </tr>
+                
+                            <tr>
+                                <td>Applied Materials (AMAT)</td>
+                                <td>$381.11</td>
+                                <td>$404.86</td>
+                                <td class="negative-cell">-5.87%</td>
+                                <td>$346.18</td>
+                                <td class="positive-cell">10.09%</td>
+                            </tr>
+                
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">株価推移 (直近5日・1時間足)</div>
+                    <div class="charts-container">
+            
+                        <div class="chart-wrapper">
+                            <h3>NVIDIA (NVDA)</h3>
+                            <canvas id="chart_NVDA"></canvas>
+                        </div>
+                
+                        <div class="chart-wrapper">
+                            <h3>Micron (MU)</h3>
+                            <canvas id="chart_MU"></canvas>
+                        </div>
+                
+                        <div class="chart-wrapper">
+                            <h3>Broadcom (AVGO)</h3>
+                            <canvas id="chart_AVGO"></canvas>
+                        </div>
+                
+                        <div class="chart-wrapper">
+                            <h3>AMD (AMD)</h3>
+                            <canvas id="chart_AMD"></canvas>
+                        </div>
+                
+                        <div class="chart-wrapper">
+                            <h3>Corning (GLW)</h3>
+                            <canvas id="chart_GLW"></canvas>
+                        </div>
+                
+                        <div class="chart-wrapper">
+                            <h3>Applied Materials (AMAT)</h3>
+                            <canvas id="chart_AMAT"></canvas>
+                        </div>
+                
+                    </div>
+                </div>
+                
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+                <script>
+            
+                    new Chart(document.getElementById('chart_NVDA'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'NVIDIA 株価',
+                                data: [200.36000061035156, 201.6009063720703, 201.09500122070312, 201.7449951171875, 201.6649932861328, 201.6750030517578, 202.4199981689453, 201.76010131835938, 202.5084991455078, 201.10629272460938, 199.43499755859375, 199.13999938964844, 199.11000061035156, 199.7100067138672, 202.60499572753906, 208.9158935546875, 209.5749969482422, 209.3300018310547, 208.1927032470703, 208.51800537109375, 208.19000244140625, 208.69500732421875, 209.8800048828125, 211.4550018310547, 213.61000061035156, 215.6999969482422, 215.49000549316406, 216.6300048828125, 212.375, 209.10000610351562, 210.11000061035156, 210.7899932861328, 212.84500122070312, 214.06500244140625, 213.14999389648438],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                    new Chart(document.getElementById('chart_MU'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'Micron 株価',
+                                data: [474.29998779296875, 475.47198486328125, 479.9999084472656, 484.8500061035156, 485.635009765625, 486.989990234375, 487.3299865722656, 477.635009765625, 483.9999084472656, 487.9999084472656, 482.07501220703125, 478.9599914550781, 476.76800537109375, 482.0, 501.9800109863281, 500.8659973144531, 498.4150085449219, 495.3800048828125, 494.2049865722656, 496.94500732421875, 496.0, 517.405029296875, 521.0750122070312, 522.3800048828125, 520.0, 518.4498901367188, 518.719970703125, 524.7000122070312, 501.95001220703125, 495.16650390625, 494.2099914550781, 499.44000244140625, 509.32000732421875, 506.2049865722656, 504.239990234375],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                    new Chart(document.getElementById('chart_AVGO'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'Broadcom 株価',
+                                data: [411.19000244140625, 416.2900085449219, 419.05999755859375, 419.1300048828125, 419.6499938964844, 419.6050109863281, 422.6000061035156, 425.5899963378906, 428.1300048828125, 428.0799865722656, 421.55999755859375, 421.2099914550781, 419.9700012207031, 419.9800109863281, 413.80999755859375, 414.739990234375, 420.5199890136719, 418.9200134277344, 421.0718078613281, 422.57000732421875, 422.75, 416.8800048828125, 416.5450134277344, 416.4800109863281, 415.9800109863281, 415.9259948730469, 416.5849914550781, 418.32000732421875, 402.80999755859375, 396.8500061035156, 396.6499938964844, 397.260009765625, 400.55999755859375, 400.8999938964844, 399.8299865722656],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                    new Chart(document.getElementById('chart_AMD'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'AMD 株価',
+                                data: [295.1817932128906, 297.8500061035156, 296.1400146484375, 300.44000244140625, 300.0799865722656, 302.46051025390625, 303.44000244140625, 305.8500061035156, 308.80999755859375, 308.92498779296875, 303.80999755859375, 304.4150085449219, 303.8999938964844, 305.239990234375, 346.3399963378906, 347.6199951171875, 351.0, 346.5950012207031, 346.014892578125, 346.32000732421875, 347.760009765625, 334.7699890136719, 333.6000061035156, 332.9798889160156, 335.1050109863281, 336.07000732421875, 336.8699951171875, 334.4800109863281, 323.95001220703125, 319.69989013671875, 320.54998779296875, 322.6401062011719, 325.9599914550781, 324.6203918457031, 323.1099853515625],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                    new Chart(document.getElementById('chart_GLW'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'Corning 株価',
+                                data: [165.24000549316406, 166.66000366210938, 167.00999450683594, 167.89500427246094, 168.59500122070312, 167.8300018310547, 168.74000549316406, 170.30999755859375, 171.72999572753906, 170.7100067138672, 168.5500030517578, 169.66000366210938, 168.99989318847656, 169.47999572753906, 173.5800018310547, 176.88999938964844, 177.4499969482422, 176.86500549316406, 176.5500030517578, 176.4149932861328, 175.9199981689453, 170.3800048828125, 169.14500427246094, 169.25, 169.49000549316406, 170.4199981689453, 167.70010375976562, 168.0, 154.9600067138672, 153.53819274902344, 154.2449951171875, 155.13999938964844, 154.4199981689453, 154.11000061035156, 152.98500061035156],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                    new Chart(document.getElementById('chart_AMAT'), {
+                        type: 'line',
+                        data: {
+                            labels: ['04/22 09:30', '04/22 10:30', '04/22 11:30', '04/22 12:30', '04/22 13:30', '04/22 14:30', '04/22 15:30', '04/23 09:30', '04/23 10:30', '04/23 11:30', '04/23 12:30', '04/23 13:30', '04/23 14:30', '04/23 15:30', '04/24 09:30', '04/24 10:30', '04/24 11:30', '04/24 12:30', '04/24 13:30', '04/24 14:30', '04/24 15:30', '04/27 09:30', '04/27 10:30', '04/27 11:30', '04/27 12:30', '04/27 13:30', '04/27 14:30', '04/27 15:30', '04/28 09:30', '04/28 10:30', '04/28 11:30', '04/28 12:30', '04/28 13:30', '04/28 14:30', '04/28 15:30'],
+                            datasets: [{
+                                label: 'Applied Materials 株価',
+                                data: [396.4700012207031, 397.7900085449219, 400.0700988769531, 402.2200012207031, 400.989990234375, 403.1000061035156, 403.4700012207031, 411.0350036621094, 409.2099914550781, 408.20001220703125, 403.3349914550781, 402.80999755859375, 400.7200012207031, 403.9100036621094, 413.79998779296875, 416.1499938964844, 419.6199951171875, 417.4200134277344, 418.32000732421875, 417.260009765625, 416.9200134277344, 403.6600036621094, 401.3349914550781, 401.4750061035156, 400.5899963378906, 401.7900085449219, 403.2300109863281, 404.8399963378906, 384.1600036621094, 380.4649963378906, 382.5950012207031, 379.70001220703125, 386.30999755859375, 384.8999938964844, 381.0400085449219],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#667eea'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: '株価 ($)'
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 12
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: '日時'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                
+                </script>
+            
+                <div class="timestamp">
+                    更新時刻: 2026年04月29日 20:55:45
+                </div>
+            </div>
+        </body>
+        </html>
+        
