@@ -1,0 +1,36 @@
+name: Daily Stock News to Notion
+
+# 1. いつ実行するかを決める設定
+on:
+  schedule:
+    # 毎日日本時間の朝8:00に実行（UTC時間では前日の23:00）
+    - cron: '0 23 * * *'
+  workflow_dispatch: # これを入れておくと、ボタンを押して手動でいつでもテスト実行できます
+
+jobs:
+  run-python-script:
+    runs-on: ubuntu-latest # GitHubが用意してくれる仮想PC（Linux）
+
+    steps:
+    # 2. あなたがアップロードしたPythonファイルを仮想PCにコピー
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 3. 仮想PCにPythonを入れる
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    # 4. 必要なライブラリをインストールする
+    - name: Install dependencies
+      run: |
+        pip install requests beautifulsoup4 google-generativeai
+
+    # 5. 金庫から鍵を取り出して、Pythonプログラムを実行する
+    - name: Run script
+      env:
+        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        DATABASE_ID: ${{ secrets.DATABASE_ID }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: python main.py  # あなたのメインのPythonファイル名に変えてください
