@@ -4,7 +4,7 @@ name: Daily Stock Analysis
 on:
   # 毎日日本時間9:00（UTC 0:00）に実行
   schedule:
-    - cron: '0 0 * * 1-5'  # 平日のみ
+    - cron: '0 7 * * *'  # 平日のみ 変更
   # 手動実行も可能
   workflow_dispatch:
 
