@@ -1,10 +1,10 @@
-name: Daily Stock News to Notion
+name: Daily Stock News to Notion　休止
 
 # 1. いつ実行するかを決める設定
-on:
+#on:
   schedule:
     # 毎日日本時間の朝8:00に実行（UTC時間では前日の23:00）
-    - cron: '0 23 * * *'
+   # - cron: '0 23 * * *'
   workflow_dispatch: # これを入れておくと、ボタンを押して手動でいつでもテスト実行できます
 
 jobs:
